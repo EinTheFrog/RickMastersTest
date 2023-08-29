@@ -5,4 +5,7 @@
     <string name="my_house">Мой Дом</string>
     <string name="cameras">Камеры</string>
     <string name="doors">Двери</string>
+
+    // Content Descriptions
+    <string name="camera_screenshot_description">Camera Screenshot</string>
 </resources>

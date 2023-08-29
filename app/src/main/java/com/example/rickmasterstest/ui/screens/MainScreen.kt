@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rickmasterstest.R
+import com.example.rickmasterstest.ui.screens.cameras.CamerasScreen
 import com.example.rickmasterstest.ui.theme.RickMastersTestTheme
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -41,10 +42,10 @@ fun MainScreen(modifier: Modifier = Modifier, name: String) {
             HorizontalPagerBar(modifier = Modifier.fillMaxWidth(), state = pagerState)
             HorizontalPager(state = pagerState) { page ->
                 // Our page content
-                Text(
-                    text = "Page: $page",
-                    modifier = Modifier.fillMaxWidth()
-                )
+                when(page) {
+                    0 -> CamerasScreen()
+                }
+
             }
         }
     }
