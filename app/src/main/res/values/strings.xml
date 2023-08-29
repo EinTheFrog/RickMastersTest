@@ -2,6 +2,7 @@
     <string name="app_name">RickMastersTest</string>
     
     // Main Screen
+    <string name="my_house">Мой Дом</string>
     <string name="cameras">Камеры</string>
     <string name="doors">Двери</string>
 </resources>
