@@ -19,11 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.rickmasterstest.R
 import com.example.rickmasterstest.model.domain.CameraDomain
 import com.example.rickmasterstest.model.domain.RoomDomain
@@ -78,8 +80,8 @@ fun ErrorScreen(state: CamerasState.Error) {
 
 @Composable
 fun RoomItem(room: RoomDomain) {
-    Text(room.name)
-    Column {
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
+        Text(text = room.name)
         room.cameras.forEach {
             CameraItem(camera = it)
         }
@@ -92,16 +94,20 @@ fun CameraItem(camera: CameraDomain) {
         elevation = CardDefaults.cardElevation(10.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp)
+            .padding(top = 16.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = stringResource(id = R.string.camera_screenshot_description)
-            )
+        Column {
+            Box {
+                AsyncImage(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Crop,
+                    model = camera.snapshot,
+                    contentDescription = stringResource(id = R.string.camera_screenshot_description)
+                )
+            }
             Text(
+                modifier = Modifier.padding(16.dp),
                 text = camera.name
             )
         }
