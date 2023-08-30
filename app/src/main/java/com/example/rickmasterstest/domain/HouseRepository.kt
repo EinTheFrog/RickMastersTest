@@ -1,9 +1,8 @@
 package com.example.rickmasterstest.domain
 
+import com.example.rickmasterstest.model.domain.RoomDomain
+
 interface HouseRepository {
-
-    fun getCameras()
-
-    fun getDoors()
-
+    suspend fun getRooms(): Result<List<RoomDomain>>
+    suspend fun getDoors()
 }
