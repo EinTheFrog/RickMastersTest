@@ -1,6 +1,7 @@
 package com.example.rickmasterstest.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,7 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rickmasterstest.R
 import com.example.rickmasterstest.ui.screens.cameras.CamerasScreen
+import com.example.rickmasterstest.ui.screens.doors.DoorsScreen
 import com.example.rickmasterstest.ui.theme.RickMastersTestTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +49,7 @@ fun MainScreen(modifier: Modifier = Modifier, name: String) {
                 // Our page content
                 when(page) {
                     0 -> CamerasScreen()
+                    1 -> DoorsScreen()
                 }
 
             }
@@ -62,6 +68,8 @@ fun TopBar(title: String) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HorizontalPagerBar(modifier: Modifier = Modifier, state: PagerState) {
+    val coroutineScope = rememberCoroutineScope()
+
     Row(modifier = modifier) {
         for (i in 0 until state.pageCount) {
             val title = when(i) {
@@ -70,8 +78,15 @@ fun HorizontalPagerBar(modifier: Modifier = Modifier, state: PagerState) {
                 else -> "Not Defined"
             }
             val isCurrent = i == state.currentPage
-            Box(modifier = Modifier.weight(1f)) {
-                PagerBarItem(title = title, isCurrent = isCurrent)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { coroutineScope.launch { state.scrollToPage(i) } }
+            ) {
+                PagerBarItem(
+                    title = title,
+                    isCurrent = isCurrent
+                )
             }
         }
     }

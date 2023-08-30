@@ -1,4 +1,4 @@
-package com.example.rickmasterstest.ui.screens.cameras
+package com.example.rickmasterstest.ui.screens.doors
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -29,42 +29,42 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.rickmasterstest.R
-import com.example.rickmasterstest.model.domain.CameraDomain
-import com.example.rickmasterstest.model.domain.RoomDomain
+import com.example.rickmasterstest.model.domain.DoorDomain
+import com.example.rickmasterstest.ui.screens.cameras.LoadingScreen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CamerasScreen() {
-    val viewModel = hiltViewModel<CamerasViewModel>()
+fun DoorsScreen() {
+    val viewModel = hiltViewModel<DoorsViewModel>()
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = state is CamerasState.Loading,
-        onRefresh = { viewModel.fetchCameras() }
+        refreshing = state is DoorsState.Loading,
+        onRefresh = { viewModel.fetchDoors() }
     )
 
     LaunchedEffect(true) {
-        viewModel.fetchCameras()
+        viewModel.fetchDoors()
     }
 
     Box(modifier = Modifier
         .fillMaxSize()
         .pullRefresh(pullRefreshState)) {
         when(state) {
-            is CamerasState.Default -> DefaultScreen(state = state)
-            is CamerasState.Loading, null -> LoadingScreen(pullRefreshState = pullRefreshState)
-            is CamerasState.Error -> ErrorScreen(state = state)
+            is DoorsState.Default -> DefaultScreen(state = state)
+            is DoorsState.Loading, null -> LoadingScreen(pullRefreshState = pullRefreshState)
+            is DoorsState.Error -> ErrorScreen(state = state)
         }
     }
 }
 
 @Composable
-fun DefaultScreen(state: CamerasState.Default) {
-    val rooms = state.roomList
+fun DefaultScreen(state: DoorsState.Default) {
+    val doors = state.doorList
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        items(rooms.size) { index ->
-            RoomItem(room = rooms[index])
+        items(doors.size) { index ->
+            DoorItem(door = doors[index])
         }
     }
 }
@@ -78,22 +78,12 @@ fun LoadingScreen(pullRefreshState: PullRefreshState) {
 }
 
 @Composable
-fun ErrorScreen(state: CamerasState.Error) {
+fun ErrorScreen(state: DoorsState.Error) {
     Text(text = state.exception.toString())
 }
 
 @Composable
-fun RoomItem(room: RoomDomain) {
-    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
-        Text(text = room.name)
-        room.cameras.forEach {
-            CameraItem(camera = it)
-        }
-    }
-}
-
-@Composable
-fun CameraItem(camera: CameraDomain) {
+fun DoorItem(door: DoorDomain) {
     Card(
         elevation = CardDefaults.cardElevation(10.dp),
         modifier = Modifier
@@ -105,13 +95,15 @@ fun CameraItem(camera: CameraDomain) {
             Box(
                 contentAlignment = Alignment.TopEnd
             ) {
-                AsyncImage(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop,
-                    model = camera.snapshot,
-                    contentDescription = stringResource(id = R.string.camera_screenshot_description)
-                )
-                if (camera.favorites) {
+                if (door.snapshot != null) {
+                    AsyncImage(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentScale = ContentScale.Crop,
+                        model = door.snapshot,
+                        contentDescription = stringResource(id = R.string.camera_screenshot_description)
+                    )
+                }
+                if (door.favorites) {
                     Image(
                         modifier = Modifier.padding(16.dp).size(32.dp),
                         painter = painterResource(id = R.drawable.star),
@@ -121,7 +113,7 @@ fun CameraItem(camera: CameraDomain) {
             }
             Text(
                 modifier = Modifier.padding(16.dp),
-                text = camera.name
+                text = door.name
             )
         }
 

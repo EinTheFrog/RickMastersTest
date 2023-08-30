@@ -3,16 +3,18 @@ package com.example.rickmasterstest.domain
 import com.example.rickmasterstest.data.network.HouseApi
 import com.example.rickmasterstest.model.domain.RoomDomain
 import com.example.rickmasterstest.model.mappers.CameraMapper
+import com.example.rickmasterstest.model.mappers.DoorMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class HouseRepositoryImpl @Inject constructor(
     private val houseApi: HouseApi,
-    private val cameraMapper: CameraMapper
+    private val cameraMapper: CameraMapper,
+    private val doorMapper: DoorMapper
 ): HouseRepository {
     override suspend fun getRooms(): Result<List<RoomDomain>> = withContext(Dispatchers.IO) {
-        val call = houseApi.getCamerasData()
+        val call = houseApi.getCameras()
         val response = call.execute()
         val responseBody = response.body()
         if (response.isSuccessful && responseBody != null) {
@@ -24,6 +26,14 @@ class HouseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getDoors() = withContext(Dispatchers.IO) {
-        TODO("Not yet implemented")
+        val call = houseApi.getDoors()
+        val response = call.execute()
+        val responseBody = response.body()
+        if (response.isSuccessful && responseBody != null) {
+            val doors = responseBody.doors
+            return@withContext Result.success(doorMapper.networkToDomain(doors))
+        } else {
+            return@withContext Result.failure(Exception(response.errorBody()?.toString()))
+        }
     }
 }

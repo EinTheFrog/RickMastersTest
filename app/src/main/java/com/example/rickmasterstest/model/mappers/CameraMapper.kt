@@ -2,12 +2,12 @@ package com.example.rickmasterstest.model.mappers
 
 import com.example.rickmasterstest.model.domain.CameraDomain
 import com.example.rickmasterstest.model.domain.RoomDomain
-import com.example.rickmasterstest.model.network.DataNetwork
+import com.example.rickmasterstest.model.network.CameraDataNetwork
 
 class CameraMapper {
-    fun networkToDomain(dataNetwork: DataNetwork): List<RoomDomain> {
-        val roomNameList = dataNetwork.rooms
-        val cameraNetworkList = dataNetwork.cameras
+    fun networkToDomain(cameraDataNetwork: CameraDataNetwork): List<RoomDomain> {
+        val roomNameList = cameraDataNetwork.rooms
+        val cameraNetworkList = cameraDataNetwork.cameras
         val roomDomainList = roomNameList.map { roomName ->
             val roomCameraNetworkList = cameraNetworkList.filter { it.room == roomName }
             val roomCameraDomainList = roomCameraNetworkList.map {

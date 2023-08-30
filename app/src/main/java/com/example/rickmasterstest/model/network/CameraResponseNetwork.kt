@@ -1,6 +1,6 @@
 package com.example.rickmasterstest.model.network
 
-data class ResponseNetwork(
+data class CameraResponseNetwork(
     val success: Boolean,
-    val data: DataNetwork
+    val data: CameraDataNetwork
 )
