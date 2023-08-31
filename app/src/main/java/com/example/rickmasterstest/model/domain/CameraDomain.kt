@@ -5,5 +5,5 @@ data class CameraDomain(
     val snapshot: String,
     val id: Int,
     val favorites: Boolean,
-    val rect: Boolean
+    val rec: Boolean
 )

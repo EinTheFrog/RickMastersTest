@@ -16,7 +16,7 @@ class CameraMapper {
                     snapshot = it.snapshot,
                     id = it.id,
                     favorites = it.favorites,
-                    rect = it.rect
+                    rec = it.rec
                 )
             }
             RoomDomain(

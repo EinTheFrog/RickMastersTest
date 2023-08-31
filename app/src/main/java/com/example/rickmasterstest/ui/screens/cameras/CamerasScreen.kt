@@ -1,8 +1,10 @@
 package com.example.rickmasterstest.ui.screens.cameras
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,7 +64,8 @@ fun DefaultScreen(state: CamerasState.Default) {
     val rooms = state.roomList
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp)) {
+        .padding(horizontal = 24.dp)
+    ) {
         items(rooms.size) { index ->
             RoomItem(room = rooms[index])
         }
@@ -95,35 +98,71 @@ fun RoomItem(room: RoomDomain) {
 @Composable
 fun CameraItem(camera: CameraDomain) {
     Card(
-        elevation = CardDefaults.cardElevation(10.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column {
-            Box(
-                contentAlignment = Alignment.TopEnd
-            ) {
-                AsyncImage(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop,
-                    model = camera.snapshot,
-                    contentDescription = stringResource(id = R.string.camera_screenshot_description)
-                )
-                if (camera.favorites) {
-                    Image(
-                        modifier = Modifier.padding(16.dp).size(32.dp),
-                        painter = painterResource(id = R.drawable.star),
-                        contentDescription = stringResource(id = R.string.camera_favorite_description)
-                    )
-                }
-            }
+            Snapshot(
+                snapshot = camera.snapshot,
+                favorites = camera.favorites,
+                rec = camera.rec
+            )
             Text(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(24.dp),
                 text = camera.name
             )
         }
+    }
+}
 
+@Composable
+fun Snapshot(snapshot: String, favorites: Boolean, rec: Boolean) {
+    Box(
+        contentAlignment = Alignment.TopEnd
+    ) {
+        AsyncImage(
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Crop,
+            model = snapshot,
+            contentDescription = stringResource(id = R.string.camera_screenshot_description)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            RecIcon(isRecording = rec)
+            FavoritesIcon(isFavorite = favorites)
+        }
+    }
+}
+
+@Composable
+fun FavoritesIcon(isFavorite: Boolean) {
+    Box(modifier = Modifier.padding(24.dp).size(24.dp)) {
+        if (isFavorite) {
+            Image(
+                modifier = Modifier
+                    .size(24.dp),
+                painter = painterResource(id = R.drawable.star),
+                contentDescription = stringResource(id = R.string.favorite_description)
+            )
+        }
+    }
+}
+
+@Composable
+fun RecIcon(isRecording: Boolean) {
+    Box(modifier = Modifier.padding(24.dp).size(24.dp)) {
+        if (isRecording) {
+            Image(
+                modifier = Modifier
+                    .size(24.dp),
+                painter = painterResource(id = R.drawable.rec),
+                contentDescription = stringResource(id = R.string.favorite_description)
+            )
+        }
     }
 }

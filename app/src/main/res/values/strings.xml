@@ -8,5 +8,7 @@
 
     // Content Descriptions
     <string name="camera_screenshot_description">Camera Screenshot</string>
-    <string name="camera_favorite_description">Camera Favorite Icon</string>
+    <string name="favorite_description">Favorite Icon</string>
+    <string name="lock_description">Lock Icon</string>
+    <string name="lock_open_description">Lock Open Icon</string>
 </resources>

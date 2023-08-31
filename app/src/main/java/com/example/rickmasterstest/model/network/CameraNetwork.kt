@@ -6,5 +6,5 @@ data class CameraNetwork(
     val room: String,
     val id: Int,
     val favorites: Boolean,
-    val rect: Boolean
+    val rec: Boolean
 )

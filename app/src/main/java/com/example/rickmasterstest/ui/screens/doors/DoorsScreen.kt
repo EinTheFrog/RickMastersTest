@@ -3,6 +3,7 @@ package com.example.rickmasterstest.ui.screens.doors
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,7 +63,8 @@ fun DefaultScreen(state: DoorsState.Default) {
     val doors = state.doorList
     LazyColumn(modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp)) {
+        .padding(horizontal = 24.dp)
+    ) {
         items(doors.size) { index ->
             DoorItem(door = doors[index])
         }
@@ -85,37 +87,80 @@ fun ErrorScreen(state: DoorsState.Error) {
 @Composable
 fun DoorItem(door: DoorDomain) {
     Card(
-        elevation = CardDefaults.cardElevation(10.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column {
-            Box(
-                contentAlignment = Alignment.TopEnd
-            ) {
-                if (door.snapshot != null) {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Crop,
-                        model = door.snapshot,
-                        contentDescription = stringResource(id = R.string.camera_screenshot_description)
-                    )
-                }
-                if (door.favorites) {
-                    Image(
-                        modifier = Modifier.padding(16.dp).size(32.dp),
-                        painter = painterResource(id = R.drawable.star),
-                        contentDescription = stringResource(id = R.string.camera_favorite_description)
-                    )
-                }
+            if (door.snapshot != null) {
+                Snapshot(snapshot = door.snapshot, favorites = door.favorites)
             }
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = door.name
+            Description(
+                name = door.name,
+                favorites = door.favorites,
+                hasSnapshot = door.snapshot != null
             )
         }
-
     }
+}
+
+@Composable
+fun Snapshot(snapshot: String, favorites: Boolean) {
+    Box(
+        contentAlignment = Alignment.TopEnd
+    ) {
+        AsyncImage(
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Crop,
+            model = snapshot,
+            contentDescription = stringResource(id = R.string.camera_screenshot_description)
+        )
+        FavoritesIcon(isFavorite = favorites)
+    }
+}
+
+@Composable
+fun Description(name: String, favorites: Boolean, hasSnapshot: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(24.dp)
+                .weight(1f),
+            text = name
+        )
+        if (!hasSnapshot) {
+            FavoritesIcon(isFavorite = favorites)
+        }
+        LockIcon(isLocked = true)
+    }
+}
+
+@Composable
+fun FavoritesIcon(isFavorite: Boolean) {
+    if (isFavorite) {
+        Image(
+            modifier = Modifier
+                .padding(24.dp)
+                .size(24.dp),
+            painter = painterResource(id = R.drawable.star),
+            contentDescription = stringResource(id = R.string.favorite_description)
+        )
+    }
+}
+
+@Composable
+fun LockIcon(isLocked: Boolean) {
+    val painterResourceId = if (isLocked) R.drawable.lock else R.drawable.lock_open
+    Image(
+        modifier = Modifier
+            .padding(top = 24.dp, end = 24.dp, bottom = 24.dp)
+            .size(24.dp),
+        painter = painterResource(id = painterResourceId),
+        contentDescription = stringResource(id = R.string.lock_open_description)
+    )
 }
