@@ -81,7 +81,7 @@ fun LoadingScreen(pullRefreshState: PullRefreshState) {
 
 @Composable
 fun ErrorScreen(state: DoorsState.Error) {
-    Text(text = state.exception.toString())
+    Text(modifier = Modifier.fillMaxSize().padding(24.dp), text = state.exception.toString())
 }
 
 @Composable

@@ -24,7 +24,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = Blue,
     surface = Sand,
-    primaryContainer = White,
+    primaryContainer = Sand,
     surfaceVariant = White,
     background = Sand
 
