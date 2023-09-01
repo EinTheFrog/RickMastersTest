@@ -1,5 +1,9 @@
 package com.example.rickmasterstest.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -111,8 +115,13 @@ fun PagerBarItem(title: String, isCurrent: Boolean) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val color = if (isCurrent) MaterialTheme.colorScheme.primary else Color.Transparent
         Text(modifier = Modifier.padding(8.dp), text = title)
-        Divider(color = color, thickness = 4.dp)
+        Crossfade(isCurrent) { isCurrent ->
+            if (isCurrent) {
+                Divider(color = MaterialTheme.colorScheme.primary, thickness = 4.dp)
+            } else {
+                Divider(color = Color.Transparent, thickness = 4.dp)
+            }
+        }
     }
 }

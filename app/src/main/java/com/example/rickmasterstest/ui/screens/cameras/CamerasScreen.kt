@@ -198,6 +198,7 @@ fun Snapshot(snapshot: String, favorites: Boolean, rec: Boolean) {
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop,
             model = snapshot,
+            error = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = stringResource(id = R.string.camera_screenshot_description)
         )
         Row(

@@ -90,7 +90,7 @@ fun FavoritesButton(isFavorite: Boolean, onClick: () -> Unit) {
 @Composable
 fun FavoritesIcon(isFavorite: Boolean) {
     AnimatedVisibility (
-        isFavorite,
+        visible = isFavorite,
         enter = fadeIn(),
         exit = fadeOut()
     ) {

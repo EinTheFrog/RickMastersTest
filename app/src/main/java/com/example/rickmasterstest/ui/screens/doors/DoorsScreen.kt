@@ -243,6 +243,7 @@ fun Snapshot(snapshot: String, favorites: Boolean) {
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.Crop,
             model = snapshot,
+            error = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = stringResource(id = R.string.camera_screenshot_description)
         )
         FavoritesIcon(isFavorite = favorites)
@@ -260,10 +261,7 @@ fun Description(name: String, favorites: Boolean, hasSnapshot: Boolean) {
             .weight(1f)) {
             Text(text = name)
             if (hasSnapshot) {
-                Text(
-                    text = stringResource(id = R.string.online),
-                    style = MaterialTheme.typography.labelMedium
-                )
+                OnlineLabel()
             }
         }
         if (!hasSnapshot) {
@@ -272,6 +270,16 @@ fun Description(name: String, favorites: Boolean, hasSnapshot: Boolean) {
         LockIcon(isLocked = true)
     }
 }
+
+@Composable
+fun OnlineLabel() {
+    Text(
+        text = stringResource(id = R.string.online),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    )
+}
+
 @Composable
 fun LockIcon(isLocked: Boolean) {
     val painterResourceId = if (isLocked) R.drawable.lock else R.drawable.lock_open
