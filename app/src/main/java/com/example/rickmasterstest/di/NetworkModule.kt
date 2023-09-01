@@ -15,7 +15,7 @@ import javax.inject.Singleton
 object NetworkModule {
     @Singleton
     @Provides
-    fun provideRetrofit() = Retrofit.Builder()
+    fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("http://cars.cprogroup.ru/api/rubetek/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()

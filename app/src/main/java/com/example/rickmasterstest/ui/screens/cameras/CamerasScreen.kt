@@ -56,11 +56,11 @@ fun CamerasScreen() {
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state is CamerasState.Loading,
-        onRefresh = { viewModel.fetchCameras() }
+        onRefresh = { viewModel.getCameras() }
     )
 
     LaunchedEffect(true) {
-        viewModel.fetchCameras()
+        viewModel.getCameras()
     }
 
     Box(modifier = Modifier

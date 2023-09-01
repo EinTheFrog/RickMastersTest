@@ -10,11 +10,13 @@ import androidx.compose.ui.Modifier
 import com.example.rickmasterstest.ui.screens.MainScreen
 import com.example.rickmasterstest.ui.theme.RickMastersTestTheme
 import dagger.hilt.android.AndroidEntryPoint
+import io.realm.Realm
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Realm.init(this)
         setContent {
             RickMastersTestTheme {
                 Surface(

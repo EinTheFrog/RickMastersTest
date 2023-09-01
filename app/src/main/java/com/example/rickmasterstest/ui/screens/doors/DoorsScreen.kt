@@ -59,11 +59,11 @@ fun DoorsScreen() {
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state is DoorsState.Loading,
-        onRefresh = { viewModel.fetchDoors() }
+        onRefresh = { viewModel.getDoors() }
     )
 
     LaunchedEffect(true) {
-        viewModel.fetchDoors()
+        viewModel.getDoors()
     }
 
     Box(modifier = Modifier
