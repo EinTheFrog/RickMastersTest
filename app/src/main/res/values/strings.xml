@@ -1,18 +1,18 @@
 <resources>
-    <string name="app_name">RickMastersTest</string>
+    <string name="app_name" translatable="false">RickMastersTest</string>
     
     // Main Screen
-    <string name="my_house">Мой дом</string>
-    <string name="cameras">Камеры</string>
-    <string name="doors">Двери</string>
+    <string name="my_house">My House</string>
+    <string name="cameras">Cameras</string>
+    <string name="doors">Doors</string>
 
     // Door Screen
-    <string name="online">В сети</string>
-    <string name="door_name_dialog_title">Введите новое имя двери</string>
+    <string name="online">Online</string>
+    <string name="door_name_dialog_title">Enter new door name</string>
 
     // Widgets
-    <string name="confirm">Ок</string>
-    <string name="dismiss">Отмена</string>
+    <string name="confirm">OK</string>
+    <string name="dismiss">Dismiss</string>
 
     // Content Descriptions
     <string name="camera_screenshot_description">Camera Screenshot</string>

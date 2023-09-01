@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_house">Мой дом</string>
+    <string name="cameras">Камеры</string>
+    <string name="doors">Двери</string>
+
+    // Door Screen
+    <string name="online">В сети</string>
+    <string name="door_name_dialog_title">Введите новое имя двери</string>
+
+    // Widgets
+    <string name="confirm">Ок</string>
+    <string name="dismiss">Отмена</string>
+
+    // Content Descriptions
+    <string name="camera_screenshot_description">Скриншот камеры</string>
+    <string name="favorite_description">Иконка избранного</string>
+    <string name="lock_description">Иконка заперто</string>
+    <string name="lock_open_description">Иконка открыто</string>
+    <string name="edit_description">Иконка изменить</string>
+</resources>

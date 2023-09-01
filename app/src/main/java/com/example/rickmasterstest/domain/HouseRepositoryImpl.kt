@@ -8,7 +8,6 @@ import com.example.rickmasterstest.model.domain.RoomDomain
 import com.example.rickmasterstest.model.mappers.CameraMapper
 import com.example.rickmasterstest.model.mappers.DoorMapper
 import io.realm.Realm
-import io.realm.RealmResults
 import io.realm.kotlin.delete
 import io.realm.kotlin.executeTransactionAwait
 import io.realm.kotlin.where
