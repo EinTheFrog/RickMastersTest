@@ -45,11 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.rickmasterstest.R
-import com.example.rickmasterstest.model.domain.CameraDomain
 import com.example.rickmasterstest.model.domain.DoorDomain
-import com.example.rickmasterstest.ui.screens.cameras.CameraItem
-import com.example.rickmasterstest.ui.screens.cameras.DragAnchors
-import com.example.rickmasterstest.ui.screens.cameras.LoadingScreen
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -59,19 +55,20 @@ fun DoorsScreen() {
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state is DoorsState.Loading,
-        onRefresh = { viewModel.getDoors() }
+        onRefresh = { viewModel.fetchDoors() }
     )
 
     LaunchedEffect(true) {
-        viewModel.getDoors()
+        viewModel.getLocalDoors()
     }
 
     Box(modifier = Modifier
         .fillMaxSize()
         .pullRefresh(pullRefreshState)) {
+        PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
         when(state) {
             is DoorsState.Default -> DefaultScreen(state = state)
-            is DoorsState.Loading, null -> LoadingScreen(pullRefreshState = pullRefreshState)
+            is DoorsState.Loading, null -> EmptyScreen()
             is DoorsState.Error -> ErrorScreen(state = state)
         }
     }
@@ -90,20 +87,21 @@ fun DefaultScreen(state: DoorsState.Default) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LoadingScreen(pullRefreshState: PullRefreshState) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
-    }
+fun EmptyScreen() {
+
 }
 
 @Composable
 fun ErrorScreen(state: DoorsState.Error) {
-    Text(modifier = Modifier
-        .fillMaxSize()
-        .padding(24.dp), text = state.exception.toString())
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(1) {
+            Text(modifier = Modifier
+                .padding(24.dp), text = state.exception.toString())
+        }
+    }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -132,6 +130,11 @@ fun DraggableDoorItem(door: DoorDomain) {
             door = door
         )
     }
+}
+
+enum class DragAnchors {
+    Start,
+    End,
 }
 
 @OptIn(ExperimentalFoundationApi::class)

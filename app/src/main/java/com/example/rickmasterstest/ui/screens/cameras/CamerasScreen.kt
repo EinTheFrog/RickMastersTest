@@ -56,19 +56,20 @@ fun CamerasScreen() {
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state is CamerasState.Loading,
-        onRefresh = { viewModel.getCameras() }
+        onRefresh = { viewModel.fetchCameras() }
     )
 
     LaunchedEffect(true) {
-        viewModel.getCameras()
+        viewModel.getLocalCameras()
     }
 
     Box(modifier = Modifier
         .fillMaxSize()
         .pullRefresh(pullRefreshState)) {
+        PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
         when(state) {
             is CamerasState.Default -> DefaultScreen(state = state)
-            is CamerasState.Loading, null -> LoadingScreen(pullRefreshState = pullRefreshState)
+            is CamerasState.Loading, null -> EmptyScreen()
             is CamerasState.Error -> ErrorScreen(state = state)
         }
     }
@@ -87,19 +88,19 @@ fun DefaultScreen(state: CamerasState.Default) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LoadingScreen(pullRefreshState: PullRefreshState) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
-    }
+fun EmptyScreen() {
+
 }
 
 @Composable
 fun ErrorScreen(state: CamerasState.Error) {
-    Text(modifier = Modifier
-        .fillMaxSize()
-        .padding(24.dp), text = state.exception.toString())
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(1) {
+            Text(modifier = Modifier
+                .padding(24.dp), text = state.exception.toString())
+        }
+    }
 }
 
 @Composable
@@ -130,9 +131,15 @@ fun DraggableCameraItem(camera: CameraDomain) {
     ) {
         FavoritesButton()
         CameraItem(
-            modifier = Modifier.offset {
-                IntOffset(x = state.requireOffset().roundToInt(), y = 0)
-            }.anchoredDraggable(state, Orientation.Horizontal),
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = state
+                            .requireOffset()
+                            .roundToInt(), y = 0
+                    )
+                }
+                .anchoredDraggable(state, Orientation.Horizontal),
             camera = camera
         )
     }
@@ -158,7 +165,9 @@ fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnc
 @Composable
 fun FavoritesButton() {
     ElevatedButton(
-        modifier = Modifier.padding(8.dp).size(36.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .size(36.dp),
         contentPadding = PaddingValues(0.dp),
         shape = CircleShape,
         onClick = { /*TODO*/ }

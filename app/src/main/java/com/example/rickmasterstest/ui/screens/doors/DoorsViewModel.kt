@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.rickmasterstest.domain.HouseRepository
 import com.example.rickmasterstest.model.domain.DoorDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,26 +18,41 @@ class DoorsViewModel @Inject constructor(
     private val _state: MutableLiveData<DoorsState> = MutableLiveData(DoorsState.Loading)
     val state: LiveData<DoorsState> = _state
 
-    fun getDoors() {
+    fun fetchDoors() {
         viewModelScope.launch {
-            _state.value = DoorsState.Loading
-            val doorsResult = houseRepository.getDoors()
-            if (doorsResult.isSuccess) {
-                val doors = doorsResult.getOrThrow()
-                houseRepository.saveDoors(doors)
-                _state.value = DoorsState.Default(doors)
-            } else {
-                getLocalDoors()
-            }
+            fetchDoors(this)
         }
     }
 
-    private suspend fun getLocalDoors() {
+    fun getLocalDoors() {
+        viewModelScope.launch {
+            getLocalDoors(this)
+        }
+    }
+
+    private suspend fun fetchDoors(scope: CoroutineScope) {
+        _state.value = DoorsState.Loading
+        val doorsResult = houseRepository.getDoors()
+        if (doorsResult.isSuccess) {
+            val doors = doorsResult.getOrThrow()
+            houseRepository.saveDoors(doors)
+            _state.value = DoorsState.Default(doors)
+        } else {
+            val error = doorsResult.exceptionOrNull()
+            _state.value = DoorsState.Error(error)
+        }
+    }
+
+    private suspend fun getLocalDoors(scope: CoroutineScope) {
         _state.value = DoorsState.Loading
         val doorsResult = houseRepository.getLocalDoors()
         if (doorsResult.isSuccess) {
             val doors = doorsResult.getOrThrow()
-            _state.value = DoorsState.Default(doors)
+            if (doors.isEmpty()) {
+                fetchDoors()
+            } else {
+                _state.value = DoorsState.Default(doors)
+            }
         } else {
             val error = doorsResult.exceptionOrNull()
             _state.value = DoorsState.Error(error)
