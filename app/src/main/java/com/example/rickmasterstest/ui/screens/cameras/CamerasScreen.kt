@@ -1,5 +1,8 @@
 package com.example.rickmasterstest.ui.screens.cameras
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -68,7 +71,10 @@ fun CamerasScreen() {
         .pullRefresh(pullRefreshState)) {
         PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
         when(state) {
-            is CamerasState.Default -> DefaultScreen(state = state)
+            is CamerasState.Default -> DefaultScreen(
+                state = state,
+                updateCameraFavorites = viewModel::updateCameraFavorites
+            )
             is CamerasState.Loading, null -> EmptyScreen()
             is CamerasState.Error -> ErrorScreen(state = state)
         }
@@ -76,14 +82,20 @@ fun CamerasScreen() {
 }
 
 @Composable
-fun DefaultScreen(state: CamerasState.Default) {
+fun DefaultScreen(
+    state: CamerasState.Default,
+    updateCameraFavorites: (CameraDomain, Boolean) -> Unit
+) {
     val rooms = state.roomList
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 24.dp)
     ) {
         items(rooms.size) { index ->
-            RoomItem(room = rooms[index])
+            RoomItem(
+                room = rooms[index],
+                updateCameraFavorites = updateCameraFavorites
+            )
         }
     }
 }
@@ -104,11 +116,17 @@ fun ErrorScreen(state: CamerasState.Error) {
 }
 
 @Composable
-fun RoomItem(room: RoomDomain) {
+fun RoomItem(
+    room: RoomDomain,
+    updateCameraFavorites: (CameraDomain, Boolean) -> Unit
+) {
     Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)) {
         Text(text = room.name)
         room.cameras.forEach {
-            DraggableCameraItem(camera = it)
+            DraggableCameraItem(
+                camera = it,
+                updateCameraFavorites = updateCameraFavorites
+            )
         }
     }
 }
@@ -121,7 +139,10 @@ enum class DragAnchors {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DraggableCameraItem(camera: CameraDomain) {
+fun DraggableCameraItem(
+    camera: CameraDomain,
+    updateCameraFavorites: (CameraDomain, Boolean) -> Unit
+) {
     val density = LocalDensity.current
     val state = remember { createAnchorDraggableState(density) }
     
@@ -129,7 +150,10 @@ fun DraggableCameraItem(camera: CameraDomain) {
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterEnd
     ) {
-        FavoritesButton()
+        FavoritesButton(
+            isFavorite = camera.favorites,
+            onClick = { updateCameraFavorites(camera, !camera.favorites) }
+        )
         CameraItem(
             modifier = Modifier
                 .offset {
@@ -163,20 +187,31 @@ fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnc
 }
 
 @Composable
-fun FavoritesButton() {
+fun FavoritesButton(isFavorite: Boolean, onClick: () -> Unit) {
     ElevatedButton(
         modifier = Modifier
             .padding(8.dp)
             .size(36.dp),
         contentPadding = PaddingValues(0.dp),
         shape = CircleShape,
-        onClick = { /*TODO*/ }
+        onClick = { onClick() }
     ) {
-        Image(
-            modifier = Modifier.size(20.dp),
-            painter = painterResource(id = R.drawable.star_outline),
-            contentDescription = stringResource(id = R.string.favorite_description)
-        )
+        Crossfade(targetState = isFavorite) { isFavorite ->
+            if (isFavorite) {
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.star),
+                    contentDescription = stringResource(id = R.string.favorite_description)
+                )
+            } else {
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.star_outline),
+                    contentDescription = stringResource(id = R.string.favorite_description)
+                )
+            }
+        }
+
     }
 }
 

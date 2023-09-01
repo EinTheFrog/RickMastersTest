@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickmasterstest.domain.HouseRepository
+import com.example.rickmasterstest.model.domain.CameraDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -26,6 +27,32 @@ class CamerasViewModel @Inject constructor(
     fun getLocalCameras() {
         viewModelScope.launch {
             getLocalCameras(this)
+        }
+    }
+
+    fun updateCameraFavorites(selectedCamera: CameraDomain, favorites: Boolean) {
+        viewModelScope.launch {
+            val state = _state.value
+            if (state !is CamerasState.Default) return@launch
+            val rooms = state.roomList
+            for (room in rooms) {
+                if (room.cameras.contains(selectedCamera)) {
+                    val newCamera = selectedCamera.copy(favorites = favorites)
+                    val newCameras = room.cameras.toMutableList()
+                    val cameraIndex = newCameras.indexOf(selectedCamera)
+                    newCameras.remove(selectedCamera)
+                    newCameras.add(cameraIndex, newCamera)
+
+                    val newRoom = room.copy(cameras = newCameras)
+                    val newRooms = rooms.toMutableList()
+                    val roomIndex = newRooms.indexOf(room)
+                    newRooms.remove(room)
+                    newRooms.add(roomIndex, newRoom)
+
+                    _state.value = CamerasState.Default(newRooms)
+                    break
+                }
+            }
         }
     }
 
