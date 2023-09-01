@@ -2,13 +2,17 @@
     <string name="app_name">RickMastersTest</string>
     
     // Main Screen
-    <string name="my_house">Мой Дом</string>
+    <string name="my_house">Мой дом</string>
     <string name="cameras">Камеры</string>
     <string name="doors">Двери</string>
+
+    // Door Screen
+    <string name="online">В сети</string>
 
     // Content Descriptions
     <string name="camera_screenshot_description">Camera Screenshot</string>
     <string name="favorite_description">Favorite Icon</string>
     <string name="lock_description">Lock Icon</string>
     <string name="lock_open_description">Lock Open Icon</string>
+    <string name="edit_description">Edit Icon</string>
 </resources>

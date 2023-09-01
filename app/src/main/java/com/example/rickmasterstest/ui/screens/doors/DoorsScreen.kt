@@ -27,6 +27,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -99,7 +100,9 @@ fun LoadingScreen(pullRefreshState: PullRefreshState) {
 
 @Composable
 fun ErrorScreen(state: DoorsState.Error) {
-    Text(modifier = Modifier.fillMaxSize().padding(24.dp), text = state.exception.toString())
+    Text(modifier = Modifier
+        .fillMaxSize()
+        .padding(24.dp), text = state.exception.toString())
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -112,11 +115,20 @@ fun DraggableDoorItem(door: DoorDomain) {
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterEnd
     ) {
-        FavoritesButton()
+        Row() {
+            EditButton()
+            FavoritesButton()
+        }
         DoorItem(
-            modifier = Modifier.offset {
-                IntOffset(x = state.requireOffset().roundToInt(), y = 0)
-            }.anchoredDraggable(state, Orientation.Horizontal),
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = state
+                            .requireOffset()
+                            .roundToInt(), y = 0
+                    )
+                }
+                .anchoredDraggable(state, Orientation.Horizontal),
             door = door
         )
     }
@@ -127,13 +139,13 @@ fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnc
     return AnchoredDraggableState(
         initialValue = DragAnchors.Start,
         positionalThreshold = { distance: Float -> distance * 0.5f },
-        velocityThreshold = { with(density) { 50.dp.toPx() } },
+        velocityThreshold = { with(density) { 100.dp.toPx() } },
         animationSpec = tween(),
     ).apply {
         updateAnchors(
             DraggableAnchors {
                 DragAnchors.Start at 0f
-                DragAnchors.End at -200f
+                DragAnchors.End at -320f
             }
         )
     }
@@ -142,15 +154,35 @@ fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnc
 @Composable
 fun FavoritesButton() {
     ElevatedButton(
-        modifier = Modifier.padding(8.dp).size(36.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .size(36.dp),
         contentPadding = PaddingValues(0.dp),
         shape = CircleShape,
         onClick = { /*TODO*/ }
     ) {
         Image(
             modifier = Modifier.size(20.dp),
-            painter = painterResource(id = R.drawable.star),
+            painter = painterResource(id = R.drawable.star_outline),
             contentDescription = stringResource(id = R.string.favorite_description)
+        )
+    }
+}
+
+@Composable
+fun EditButton() {
+    ElevatedButton(
+        modifier = Modifier
+            .padding(8.dp)
+            .size(36.dp),
+        contentPadding = PaddingValues(0.dp),
+        shape = CircleShape,
+        onClick = { /*TODO*/ }
+    ) {
+        Image(
+            modifier = Modifier.size(20.dp),
+            painter = painterResource(id = R.drawable.edit),
+            contentDescription = stringResource(id = R.string.edit_description)
         )
     }
 }
@@ -201,12 +233,17 @@ fun Description(name: String, favorites: Boolean, hasSnapshot: Boolean) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier
-                .padding(24.dp)
-                .weight(1f),
-            text = name
-        )
+        Column(modifier = Modifier
+            .padding(24.dp)
+            .weight(1f)) {
+            Text(text = name)
+            if (hasSnapshot) {
+                Text(
+                    text = stringResource(id = R.string.online),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
         if (!hasSnapshot) {
             FavoritesIcon(isFavorite = favorites)
         }

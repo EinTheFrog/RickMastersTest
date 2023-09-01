@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, name: String) {
+fun MainScreen() {
     val pagerState = rememberPagerState(pageCount = { 2 })
 
     Scaffold(
@@ -50,7 +50,6 @@ fun MainScreen(modifier: Modifier = Modifier, name: String) {
                 .fillMaxSize()
                 .padding(paddingValues)) {
             HorizontalPager(state = pagerState) { page ->
-                // Our page content
                 when(page) {
                     0 -> CamerasScreen()
                     1 -> DoorsScreen()
@@ -118,13 +117,5 @@ fun PagerBarItem(title: String, isCurrent: Boolean) {
         val color = if (isCurrent) MaterialTheme.colorScheme.primary else Color.Transparent
         Text(modifier = Modifier.padding(8.dp), text = title)
         Divider(color = color, thickness = 4.dp)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    RickMastersTestTheme {
-        MainScreen(name = "Android")
     }
 }

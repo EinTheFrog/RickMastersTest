@@ -143,13 +143,13 @@ fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnc
     return AnchoredDraggableState(
         initialValue = DragAnchors.Start,
         positionalThreshold = { distance: Float -> distance * 0.5f },
-        velocityThreshold = { with(density) { 50.dp.toPx() } },
+        velocityThreshold = { with(density) { 100.dp.toPx() } },
         animationSpec = tween(),
     ).apply {
         updateAnchors(
             DraggableAnchors {
                 DragAnchors.Start at 0f
-                DragAnchors.End at -200f
+                DragAnchors.End at -160f
             }
         )
     }
@@ -165,7 +165,7 @@ fun FavoritesButton() {
     ) {
         Image(
             modifier = Modifier.size(20.dp),
-            painter = painterResource(id = R.drawable.star),
+            painter = painterResource(id = R.drawable.star_outline),
             contentDescription = stringResource(id = R.string.favorite_description)
         )
     }
