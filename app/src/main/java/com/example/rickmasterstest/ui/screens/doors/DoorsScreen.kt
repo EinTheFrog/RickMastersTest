@@ -172,11 +172,6 @@ fun DraggableDoorItem(
             FavoritesButton(
                 isFavorite = door.favorites,
                 onClick = {
-                    coroutineScope.launch {
-                        state.anchoredDrag(targetValue = DragAnchors.Start) { _, _ ->
-                            this.dragTo(newOffset = 0f)
-                        }
-                    }
                     updateDoorFavorites(door, !door.favorites)
                 }
             )

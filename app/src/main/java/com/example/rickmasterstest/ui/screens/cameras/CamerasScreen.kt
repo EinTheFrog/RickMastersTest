@@ -135,7 +135,6 @@ fun DraggableCameraItem(
     camera: CameraDomain,
     updateCameraFavorites: (CameraDomain, Boolean) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
     val anchors = DraggableAnchors {
         DragAnchors.Start at 0f
@@ -150,11 +149,6 @@ fun DraggableCameraItem(
         FavoritesButton(
             isFavorite = camera.favorites,
             onClick = {
-                coroutineScope.launch {
-                    state.anchoredDrag(targetValue = DragAnchors.Start) { _, _ ->
-                        this.dragTo(newOffset = 0f)
-                    }
-                }
                 updateCameraFavorites(camera, !camera.favorites)
             }
         )

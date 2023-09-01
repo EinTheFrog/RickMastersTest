@@ -9,6 +9,7 @@ import com.example.rickmasterstest.model.mappers.CameraMapper
 import com.example.rickmasterstest.model.mappers.DoorMapper
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.kotlin.delete
 import io.realm.kotlin.executeTransactionAwait
 import io.realm.kotlin.where
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +70,7 @@ class HouseRepositoryImpl @Inject constructor(
         val cameraCacheList = cameraMapper.domainToCache(rooms)
         try {
             realm.executeTransactionAwait { transactionRealm ->
+                transactionRealm.delete<CameraCache>()
                 transactionRealm.insert(cameraCacheList)
             }
             return@withContext Result.success(Unit)
@@ -81,6 +83,7 @@ class HouseRepositoryImpl @Inject constructor(
         val doorCacheList = doorMapper.domainToCache(doors)
         try {
             realm.executeTransactionAwait { transactionRealm ->
+                transactionRealm.delete<DoorCache>()
                 transactionRealm.insert(doorCacheList)
             }
             return@withContext Result.success(Unit)

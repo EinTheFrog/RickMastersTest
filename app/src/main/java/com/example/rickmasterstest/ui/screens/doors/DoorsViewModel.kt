@@ -35,12 +35,13 @@ class DoorsViewModel @Inject constructor(
         viewModelScope.launch {
             val state = _state.value
             if (state !is DoorsState.Default) return@launch
-            val doors = state.doorList
+            val oldDoors = state.doorList
             val newDoor = selectedDoor.copy(favorites = favorites)
-            val newDoors = doors.substituteElement(
+            val newDoors = oldDoors.substituteElement(
                 oldElement = selectedDoor,
                 newElement = newDoor
             )
+            houseRepository.saveDoors(newDoors)
             _state.value = DoorsState.Default(newDoors)
         }
     }
@@ -49,12 +50,13 @@ class DoorsViewModel @Inject constructor(
         viewModelScope.launch {
             val state = _state.value
             if (state !is DoorsState.Default) return@launch
-            val doors = state.doorList
+            val oldDoors = state.doorList
             val newDoor = selectedDoor.copy(name = name)
-            val newDoors = doors.substituteElement(
+            val newDoors = oldDoors.substituteElement(
                 oldElement = selectedDoor,
                 newElement = newDoor
             )
+            houseRepository.saveDoors(newDoors)
             _state.value = DoorsState.Default(newDoors)
         }
     }

@@ -35,8 +35,8 @@ class CamerasViewModel @Inject constructor(
         viewModelScope.launch {
             val state = _state.value
             if (state !is CamerasState.Default) return@launch
-            val rooms = state.roomList
-            for (room in rooms) {
+            val oldRooms = state.roomList
+            for (room in oldRooms) {
                 if (room.cameras.contains(selectedCamera)) {
                     val newCamera = selectedCamera.copy(favorites = favorites)
                     val newCameras = room.cameras.substituteElement(
@@ -44,10 +44,11 @@ class CamerasViewModel @Inject constructor(
                         newElement = newCamera
                     )
                     val newRoom = room.copy(cameras = newCameras)
-                    val newRooms = rooms.substituteElement(
+                    val newRooms = oldRooms.substituteElement(
                         oldElement = room,
                         newElement = newRoom
                     )
+                    houseRepository.saveRooms(newRooms)
                     _state.value = CamerasState.Default(newRooms)
                     break
                 }
