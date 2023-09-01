@@ -8,6 +8,11 @@
 
     // Door Screen
     <string name="online">В сети</string>
+    <string name="door_name_dialog_title">Введите новое имя двери</string>
+
+    // Widgets
+    <string name="confirm">Ок</string>
+    <string name="dismiss">Отмена</string>
 
     // Content Descriptions
     <string name="camera_screenshot_description">Camera Screenshot</string>

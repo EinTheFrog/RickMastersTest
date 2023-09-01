@@ -17,22 +17,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rickmasterstest.R
 import com.example.rickmasterstest.ui.screens.cameras.CamerasScreen
 import com.example.rickmasterstest.ui.screens.doors.DoorsScreen
-import com.example.rickmasterstest.ui.theme.RickMastersTestTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -75,7 +70,9 @@ fun TopBar(title: String, pagerState: PagerState) {
 @Composable
 fun TopBarTitle(title: String) {
     Text(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         text = title,
         style = MaterialTheme.typography.titleLarge,
         textAlign = TextAlign.Center

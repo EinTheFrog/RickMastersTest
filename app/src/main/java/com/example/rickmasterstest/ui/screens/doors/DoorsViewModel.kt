@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rickmasterstest.domain.HouseRepository
 import com.example.rickmasterstest.model.domain.DoorDomain
+import com.example.rickmasterstest.utils.substituteElement
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -27,6 +28,34 @@ class DoorsViewModel @Inject constructor(
     fun getLocalDoors() {
         viewModelScope.launch {
             getLocalDoors(this)
+        }
+    }
+
+    fun updateDoorFavorites(selectedDoor: DoorDomain, favorites: Boolean) {
+        viewModelScope.launch {
+            val state = _state.value
+            if (state !is DoorsState.Default) return@launch
+            val doors = state.doorList
+            val newDoor = selectedDoor.copy(favorites = favorites)
+            val newDoors = doors.substituteElement(
+                oldElement = selectedDoor,
+                newElement = newDoor
+            )
+            _state.value = DoorsState.Default(newDoors)
+        }
+    }
+
+    fun updateDoorName(selectedDoor: DoorDomain, name: String) {
+        viewModelScope.launch {
+            val state = _state.value
+            if (state !is DoorsState.Default) return@launch
+            val doors = state.doorList
+            val newDoor = selectedDoor.copy(name = name)
+            val newDoors = doors.substituteElement(
+                oldElement = selectedDoor,
+                newElement = newDoor
+            )
+            _state.value = DoorsState.Default(newDoors)
         }
     }
 

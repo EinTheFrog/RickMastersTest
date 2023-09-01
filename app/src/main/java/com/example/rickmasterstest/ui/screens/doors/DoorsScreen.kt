@@ -1,5 +1,6 @@
 package com.example.rickmasterstest.ui.screens.doors
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -21,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
@@ -31,8 +31,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -46,11 +51,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.rickmasterstest.R
 import com.example.rickmasterstest.model.domain.DoorDomain
+import com.example.rickmasterstest.ui.screens.DragAnchors
+import com.example.rickmasterstest.ui.screens.FavoritesButton
+import com.example.rickmasterstest.ui.screens.FavoritesIcon
+import com.example.rickmasterstest.ui.screens.InputAlertDialog
+import com.example.rickmasterstest.ui.screens.createAnchorDraggableState
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DoorsScreen() {
+    var editingDoor by remember { mutableStateOf<DoorDomain?>(null) }
     val viewModel = hiltViewModel<DoorsViewModel>()
     val state = viewModel.state.observeAsState().value
     val pullRefreshState = rememberPullRefreshState(
@@ -67,22 +79,48 @@ fun DoorsScreen() {
         .pullRefresh(pullRefreshState)) {
         PullRefreshIndicator(true, pullRefreshState, Modifier.align(Alignment.TopCenter))
         when(state) {
-            is DoorsState.Default -> DefaultScreen(state = state)
+            is DoorsState.Default -> DefaultScreen(
+                state = state,
+                updateDoorFavorites = viewModel::updateDoorFavorites,
+                editDoorName = { selectedDoor -> editingDoor = selectedDoor }
+            )
             is DoorsState.Loading, null -> EmptyScreen()
             is DoorsState.Error -> ErrorScreen(state = state)
         }
     }
+    AnimatedVisibility(visible = editingDoor != null) {
+        InputAlertDialog(
+            title = stringResource(id = R.string.door_name_dialog_title),
+            onConfirm = { newName ->
+                editingDoor?.also {
+                    viewModel.updateDoorName(it, newName)
+                }
+                editingDoor = null
+            },
+            onDismiss = {
+                editingDoor = null
+            }
+        )
+    }
 }
 
 @Composable
-fun DefaultScreen(state: DoorsState.Default) {
+fun DefaultScreen(
+    state: DoorsState.Default,
+    updateDoorFavorites: (DoorDomain, Boolean) -> Unit,
+    editDoorName: (DoorDomain) -> Unit
+) {
     val doors = state.doorList
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 24.dp)
     ) {
         items(doors.size) { index ->
-            DraggableDoorItem(door = doors[index])
+            DraggableDoorItem(
+                door = doors[index],
+                updateDoorFavorites = updateDoorFavorites,
+                editDoorName = editDoorName
+            )
         }
     }
 }
@@ -105,17 +143,43 @@ fun ErrorScreen(state: DoorsState.Error) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DraggableDoorItem(door: DoorDomain) {
+fun DraggableDoorItem(
+    door: DoorDomain,
+    updateDoorFavorites: (DoorDomain, Boolean) -> Unit,
+    editDoorName: (DoorDomain) -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
-    val state = remember { createAnchorDraggableState(density) }
+    val anchors = DraggableAnchors {
+        DragAnchors.Start at 0f
+        DragAnchors.End at -320f
+    }
+    val state = remember { createAnchorDraggableState(density = density, anchors = anchors) }
 
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterEnd
     ) {
-        Row() {
-            EditButton()
-            FavoritesButton()
+        Row {
+            EditButton(onClick = {
+                coroutineScope.launch {
+                    state.anchoredDrag(targetValue = DragAnchors.Start) { _, _ ->
+                        this.dragTo(newOffset = 0f)
+                    }
+                }
+                editDoorName(door)
+            })
+            FavoritesButton(
+                isFavorite = door.favorites,
+                onClick = {
+                    coroutineScope.launch {
+                        state.anchoredDrag(targetValue = DragAnchors.Start) { _, _ ->
+                            this.dragTo(newOffset = 0f)
+                        }
+                    }
+                    updateDoorFavorites(door, !door.favorites)
+                }
+            )
         }
         DoorItem(
             modifier = Modifier
@@ -132,55 +196,15 @@ fun DraggableDoorItem(door: DoorDomain) {
     }
 }
 
-enum class DragAnchors {
-    Start,
-    End,
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-fun createAnchorDraggableState(density: Density): AnchoredDraggableState<DragAnchors> {
-    return AnchoredDraggableState(
-        initialValue = DragAnchors.Start,
-        positionalThreshold = { distance: Float -> distance * 0.5f },
-        velocityThreshold = { with(density) { 100.dp.toPx() } },
-        animationSpec = tween(),
-    ).apply {
-        updateAnchors(
-            DraggableAnchors {
-                DragAnchors.Start at 0f
-                DragAnchors.End at -320f
-            }
-        )
-    }
-}
-
 @Composable
-fun FavoritesButton() {
+fun EditButton(onClick: () -> Unit) {
     ElevatedButton(
         modifier = Modifier
             .padding(8.dp)
             .size(36.dp),
         contentPadding = PaddingValues(0.dp),
         shape = CircleShape,
-        onClick = { /*TODO*/ }
-    ) {
-        Image(
-            modifier = Modifier.size(20.dp),
-            painter = painterResource(id = R.drawable.star_outline),
-            contentDescription = stringResource(id = R.string.favorite_description)
-        )
-    }
-}
-
-@Composable
-fun EditButton() {
-    ElevatedButton(
-        modifier = Modifier
-            .padding(8.dp)
-            .size(36.dp),
-        contentPadding = PaddingValues(0.dp),
-        shape = CircleShape,
-        onClick = { /*TODO*/ }
+        onClick = { onClick() }
     ) {
         Image(
             modifier = Modifier.size(20.dp),
@@ -253,20 +277,6 @@ fun Description(name: String, favorites: Boolean, hasSnapshot: Boolean) {
         LockIcon(isLocked = true)
     }
 }
-
-@Composable
-fun FavoritesIcon(isFavorite: Boolean) {
-    if (isFavorite) {
-        Image(
-            modifier = Modifier
-                .padding(24.dp)
-                .size(24.dp),
-            painter = painterResource(id = R.drawable.star),
-            contentDescription = stringResource(id = R.string.favorite_description)
-        )
-    }
-}
-
 @Composable
 fun LockIcon(isLocked: Boolean) {
     val painterResourceId = if (isLocked) R.drawable.lock else R.drawable.lock_open
